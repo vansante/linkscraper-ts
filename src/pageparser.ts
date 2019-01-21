@@ -39,6 +39,6 @@ export class PageParser {
     }
 
     private processText(original: string, newStr: string) {
-        return (original + newStr).replace(/\\n/g, "").trim();
+        return (original + newStr).replace(/\n/g, " ").trim();
     }
 }
