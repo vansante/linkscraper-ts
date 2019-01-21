@@ -10,7 +10,7 @@ async function main() {
     await scraper.run();
 
     scraper.walkPages((page: Page, url: string) => {
-        console.log("Page: " + page.title + " on URL: ", url);
+        console.log("Page: " + page.title + " on URL: " + url);
 
         page.getLinks().forEach((link) => {
             let str = "- " + link.title + " => " + link.target;
