@@ -10,10 +10,10 @@ export const PageNotFound = new Page(MalformedURL, "Not Found");
 export const PageExternal = new Page(url.parse("http://external-page.com/299"), "External");
 
 export class Scraper {
-    public startURL: url.UrlWithStringQuery;
-    public link = new Array<Link>();
-    public pages = new Map<string, Page>();
-    public pageQueue = new Array<Page>();
+    public readonly pages = new Map<string, Page>();
+
+    private readonly startURL: url.UrlWithStringQuery;
+    private readonly pageQueue = new Array<Page>();
 
     constructor(startURL: string) {
         this.startURL = url.parse(startURL);
@@ -32,17 +32,20 @@ export class Scraper {
         }
     }
 
-    public walkPages(walker: (page: Page, url: string) => void) {
-        this.pages.forEach(walker);
-    }
-
-    private async processLinks(links: Link[]) {
+    private processLinks(links: Link[]) {
+        /*
         const proms = new Array<Promise<Page>>();
         for (const link of links) {
             proms.push(this.fetchLink(link));
         }
 
         return Promise.all(proms);
+        */
+
+        // This is cleaner
+        return Promise.all(
+            links.map(link => this.fetchLink(link)),
+        );
     }
 
     private async fetchLink(link: Link) {
@@ -66,31 +69,38 @@ export class Scraper {
         }
 
         const parsedURL = url.format(URL);
-        let page = this.pages.get(parsedURL);
-        if (page) {
-            return page;
+
+        {
+            const page = this.pages.get(parsedURL);
+            if (page) {
+                return page;
+            }
         }
 
-        try {
-            const response = await fetch(parsedURL);
+        const response = await fetch(parsedURL);
+        switch (response.status) {
+            case 404: return PageNotFound;
 
-            page = new Page(URL, "");
-            const linkParser = new PageParser(page);
-            const parser = new htmlparser.Parser(linkParser, {
-                decodeEntities: true,
-                lowerCaseAttributeNames: true,
-                lowerCaseTags: true,
-            });
+            case 200: {
+                const page = new Page(URL, "");
+                const linkParser = new PageParser(page);
+                const parser = new htmlparser.Parser(linkParser, {
+                    decodeEntities: true,
+                    lowerCaseAttributeNames: true,
+                    lowerCaseTags: true,
+                });
 
-            const text = await response.text();
-            parser.parseChunk(text);
-        } catch (ex) {
-            return PageNotFound;
+                const text = await response.text();
+                parser.parseChunk(text);
+
+                this.pages.set(parsedURL, page);
+                this.pageQueue.push(page);
+
+                return page;
+            }
+
+            default:
+                throw new Error(`unexpected status ${response.status}`);
         }
-
-        this.pages.set(parsedURL, page);
-        this.pageQueue.push(page);
-
-        return page;
     }
 }
