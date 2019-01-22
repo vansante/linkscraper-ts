@@ -33,15 +33,6 @@ export class Scraper {
     }
 
     private processLinks(links: Link[]) {
-        /*
-        const proms = new Array<Promise<Page>>();
-        for (const link of links) {
-            proms.push(this.fetchLink(link));
-        }
-
-        return Promise.all(proms);
-        */
-
         // This is cleaner
         return Promise.all(
             links.map(link => this.fetchLink(link)),
@@ -65,7 +56,7 @@ export class Scraper {
             URL.protocol = this.startURL.protocol;
         }
         if (URL.port === null) {
-            URL.protocol = this.startURL.protocol;
+            URL.port = this.startURL.port;
         }
 
         const parsedURL = url.format(URL);
@@ -79,7 +70,8 @@ export class Scraper {
 
         const response = await fetch(parsedURL);
         switch (response.status) {
-            case 404: return PageNotFound;
+            case 404:
+                return PageNotFound;
 
             case 200: {
                 const page = new Page(URL, "");

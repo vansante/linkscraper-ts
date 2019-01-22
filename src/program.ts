@@ -10,15 +10,10 @@ async function main() {
     await scraper.run();
 
     for (const [url, page] of scraper.pages) {
-        // console.log("Page: " + page.title + " on URL: " + url);
-
         // use template strings
         console.log(`Page: ${page.title} on URL: ${url}`);
 
         for (const link of page.getLinks()) {
-            // let str = "- " + link.title + " => " + link.target;
-            // str += " (" + link.targetPage.title + ")";
-
             // use template strings
             console.log(
                 `- ${link.title}" => ${link.target} ` +
