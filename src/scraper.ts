@@ -10,10 +10,9 @@ export const PageNotFound = new Page(MalformedURL, "Not Found");
 export const PageExternal = new Page(url.parse("http://external-page.com/299"), "External");
 
 export class Scraper {
-    public startURL: url.UrlWithStringQuery;
-    public link = new Array<Link>();
-    public pages = new Map<string, Page>();
-    public pageQueue = new Array<Page>();
+    private startURL: url.UrlWithStringQuery;
+    private pages = new Map<string, Page>();
+    private pageQueue = new Array<Page>();
 
     constructor(startURL: string) {
         this.startURL = url.parse(startURL);
