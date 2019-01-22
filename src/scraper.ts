@@ -69,31 +69,38 @@ export class Scraper {
         }
 
         const parsedURL = url.format(URL);
-        let page = this.pages.get(parsedURL);
-        if (page) {
-            return page;
+
+        {
+            const page = this.pages.get(parsedURL);
+            if (page) {
+                return page;
+            }
         }
 
-        try {
-            const response = await fetch(parsedURL);
+        const response = await fetch(parsedURL);
+        switch (response.status) {
+            case 404: return PageNotFound;
 
-            page = new Page(URL, "");
-            const linkParser = new PageParser(page);
-            const parser = new htmlparser.Parser(linkParser, {
-                decodeEntities: true,
-                lowerCaseAttributeNames: true,
-                lowerCaseTags: true,
-            });
+            case 200: {
+                const page = new Page(URL, "");
+                const linkParser = new PageParser(page);
+                const parser = new htmlparser.Parser(linkParser, {
+                    decodeEntities: true,
+                    lowerCaseAttributeNames: true,
+                    lowerCaseTags: true,
+                });
 
-            const text = await response.text();
-            parser.parseChunk(text);
-        } catch (ex) {
-            return PageNotFound;
+                const text = await response.text();
+                parser.parseChunk(text);
+
+                this.pages.set(parsedURL, page);
+                this.pageQueue.push(page);
+
+                return page;
+            }
+
+            default:
+                throw new Error(`unexpected status ${response.status}`);
         }
-
-        this.pages.set(parsedURL, page);
-        this.pageQueue.push(page);
-
-        return page;
     }
 }
