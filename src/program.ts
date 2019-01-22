@@ -9,28 +9,33 @@ async function main() {
     const scraper = new Scraper("https://gameye.com/home");
     await scraper.run();
 
-    scraper.pages.forEach((page: Page, url: string) => {
-        console.log("Page: " + page.title + " on URL: " + url);
+    for (const [url, page] of scraper.pages) {
+        // console.log("Page: " + page.title + " on URL: " + url);
 
-        page.getLinks().forEach((link) => {
-            let str = "- " + link.title + " => " + link.target;
-            str += " (" + link.targetPage.title + ")";
+        // use template strings
+        console.log(`Page: ${page.title} on URL: ${url}`);
 
-            console.log(str);
-        });
-    });
+        for (const link of page.getLinks()) {
+            // let str = "- " + link.title + " => " + link.target;
+            // str += " (" + link.targetPage.title + ")";
 
-    let pages = 0;
+            // use template strings
+            console.log(
+                `- ${link.title}" => ${link.target} ` +
+                `(${link.targetPage.title}")`,
+            );
+        }
+    }
+
+    const pages = scraper.pages.size;
     let links = 0;
     let deadLinks = 0;
     let internalLinks = 0;
     let externalLinks = 0;
     let mailLinks = 0;
 
-    scraper.pages.forEach((page: Page, url: string) => {
-        pages++;
-
-        page.getLinks().forEach((link) => {
+    for (const [, page] of scraper.pages)
+        for (const link of page.getLinks()) {
             links++;
 
             if (link.mailto) {
@@ -45,11 +50,16 @@ async function main() {
             if (link.dead || link.malformed) {
                 deadLinks++;
             }
-        });
-    });
 
-    console.log("\n\nResults:");
-    console.log(pages + " pages, " + links + " links.");
-    console.log("From the links, " + internalLinks + " are internal, " + externalLinks + " are external, "
-        + mailLinks + " are email links" + " and " + deadLinks + " are dead links.");
+        }
+
+    console.log("");
+    console.log("");
+    console.log("Results:");
+    console.log(`${pages} pages, ${links} links.`);
+    console.log(
+        `From the links, ${internalLinks} are internal, ` +
+        `${externalLinks} are external, ${mailLinks} are email links and ` +
+        `${deadLinks} are dead links.`,
+    );
 }
