@@ -35,13 +35,20 @@ export class Scraper {
         this.pages.forEach(walker);
     }
 
-    private async processLinks(links: Link[]) {
+    private processLinks(links: Link[]) {
+        /*
         const proms = new Array<Promise<Page>>();
         for (const link of links) {
             proms.push(this.fetchLink(link));
         }
 
         return Promise.all(proms);
+        */
+
+        // This is cleaner
+        return Promise.all(
+            links.map(link => this.fetchLink(link)),
+        );
     }
 
     private async fetchLink(link: Link) {
