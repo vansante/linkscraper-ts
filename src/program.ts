@@ -9,7 +9,7 @@ async function main() {
     const scraper = new Scraper("https://gameye.com/home");
     await scraper.run();
 
-    scraper.walkPages((page: Page, url: string) => {
+    scraper.pages.forEach((page: Page, url: string) => {
         console.log("Page: " + page.title + " on URL: " + url);
 
         page.getLinks().forEach((link) => {
@@ -27,7 +27,7 @@ async function main() {
     let externalLinks = 0;
     let mailLinks = 0;
 
-    scraper.walkPages((page: Page, url: string) => {
+    scraper.pages.forEach((page: Page, url: string) => {
         pages++;
 
         page.getLinks().forEach((link) => {

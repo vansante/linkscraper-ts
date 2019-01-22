@@ -10,9 +10,10 @@ export const PageNotFound = new Page(MalformedURL, "Not Found");
 export const PageExternal = new Page(url.parse("http://external-page.com/299"), "External");
 
 export class Scraper {
-    private startURL: url.UrlWithStringQuery;
-    private pages = new Map<string, Page>();
-    private pageQueue = new Array<Page>();
+    public readonly pages = new Map<string, Page>();
+
+    private readonly startURL: url.UrlWithStringQuery;
+    private readonly pageQueue = new Array<Page>();
 
     constructor(startURL: string) {
         this.startURL = url.parse(startURL);
@@ -29,10 +30,6 @@ export class Scraper {
             }
             await this.processLinks(current.getLiveLinks());
         }
-    }
-
-    public walkPages(walker: (page: Page, url: string) => void) {
-        this.pages.forEach(walker);
     }
 
     private processLinks(links: Link[]) {
