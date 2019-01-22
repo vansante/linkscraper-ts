@@ -1,11 +1,3 @@
-# TS-Primer
-The dawn of a TypeScript project.
+# LinkScraper
+A link scraper that scrapes all links off a website and reports some statistics.
 
-## Automated tests
-Never commit something that breaks the build! You can
-easily prevent this by linking the `test.sh` script as a git `pre-commit` hook!
-
-like this:
-```bash
-ln test.sh .git/hooks/pre-commit
-```
